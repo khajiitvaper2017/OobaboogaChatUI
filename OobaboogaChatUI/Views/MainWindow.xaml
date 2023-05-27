@@ -47,8 +47,8 @@
                     <DataTemplate>
                         <StackPanel>
                             <TextBlock Margin="4" Text="{Binding TimeStamp}" FontSize="10" Foreground="Gray" />
-                            <TextBlock Margin="10" Text="{Binding Username}" />
-                            <mdxam:MarkdownScrollViewer Margin="10" xml:space="preserve" Markdown="{Binding Message}" />
+                            <TextBlock Margin="10,10,10,0" Text="{Binding Username}" />
+                            <mdxam:MarkdownScrollViewer Margin="10,0,10,10" xml:space="preserve" Markdown="{Binding Message}" />
                         </StackPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>
