@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33530.505
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OobaboogaChatUI", "OobaboogaChatUI\OobaboogaChatUI.csproj", "{092D9458-E47E-4D8D-932D-1C919CA41C35}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{092D9458-E47E-4D8D-932D-1C919CA41C35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{092D9458-E47E-4D8D-932D-1C919CA41C35}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{092D9458-E47E-4D8D-932D-1C919CA41C35}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{092D9458-E47E-4D8D-932D-1C919CA41C35}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8C9E3B93-8CC1-4A9E-9552-73E67214E47C}
+	EndGlobalSection
+EndGlobal

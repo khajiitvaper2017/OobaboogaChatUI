@@ -1,0 +1,91 @@
+﻿<Window x:Class="OobaboogaChatUI.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:mdxam="clr-namespace:MdXaml;assembly=MdXaml"
+        xmlns:viewModels="clr-namespace:OobaboogaChatUI.ViewModels"
+        xmlns:views="clr-namespace:OobaboogaChatUI.Views"
+        mc:Ignorable="d"
+        Title="Oobabooga Chat UI"
+        Height="750" Width="600"
+        Style="{StaticResource MaterialDesignWindow}"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="16"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        WindowStartupLocation="CenterScreen">
+    <Window.DataContext>
+        <viewModels:MainWindowViewModel />
+    </Window.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ScrollViewer Grid.Row="0" CanContentScroll="False" views:AutoScrollBehavior.AutoScroll="True"
+                      VerticalScrollBarVisibility="Auto">
+            <ListView Margin="10"
+                      ItemsSource="{Binding ChatMessages}"
+                      SelectedItem="{Binding SelectedChatMessage}"
+                      Style="{StaticResource MaterialDesignCardsListBox}">
+                <ListView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Edit" Command="{Binding EditMessageCommand}" />
+                        <MenuItem Header="Delete" Command="{Binding DeleteMessageCommand}" />
+                    </ContextMenu>
+                </ListView.ContextMenu>
+                <ListView.Template>
+                    <ControlTemplate>
+                        <ItemsPresenter />
+                    </ControlTemplate>
+                </ListView.Template>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock Margin="4" Text="{Binding TimeStamp}" FontSize="10" Foreground="Gray" />
+                            <TextBlock Margin="10" Text="{Binding Username}" />
+                            <mdxam:MarkdownScrollViewer Margin="10" xml:space="preserve" Markdown="{Binding Message}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </ScrollViewer>
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBox Text="{Binding Request, UpdateSourceTrigger=PropertyChanged}"
+                     TextWrapping="Wrap"
+                     AcceptsReturn="True"
+                     Margin="10"
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                     VerticalScrollBarVisibility="Visible"
+                     VerticalAlignment="Top"
+                     HorizontalAlignment="Stretch"
+                     HorizontalContentAlignment="Stretch" />
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
+                <Button Command="{Binding SaveChatCommand}"
+                        Content="Save"
+                        Margin="10,5"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom" />
+                <Button Command="{Binding ClearChatCommand}"
+                        Content="Clear"
+                        Margin="10,5"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom" />
+                <Button Command="{Binding SendRequestCommand}"
+                        Content="Send"
+                        Margin="10,5"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom" />
+
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
