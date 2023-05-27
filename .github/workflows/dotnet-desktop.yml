@@ -2,8 +2,9 @@ name: .NET Core Desktop
 
 on:
   push:
-    tags:
-      - "class-commands/v*"
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
 
 env:
   PROJECT_PATH: OobaboogaChatUI/OobaboogaChatUI.csproj
