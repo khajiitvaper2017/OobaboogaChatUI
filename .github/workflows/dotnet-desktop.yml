@@ -28,20 +28,19 @@ jobs:
           cd OobaboogaChatUI/bin/Deploy/net6.0-windows/win-x64/publish/
           7z a -r ../../../../release.zip *
 
-      - uses: actions/create-release@v1
+      - name: Create Release
         id: create_release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
+          tag_name: ${{ github.sha }}
+          release_name: Release ${{ github.sha }}
+          draft: false
+          prerelease: false
 
-      - uses: actions/upload-artifact@v2
-        with:
-          name: release
-          path: OobaboogaChatUI/bin/release.zip
-
-      - uses: csexton/release-asset-action@v2
+      - name: Upload Release Asset
+        uses: csexton/release-asset-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           pattern: OobaboogaChatUI/bin/release.zip
