@@ -6,4 +6,4 @@ oobabooga/text-generation-webui - https://github.com/oobabooga/text-generation-w
 
 Just wanted to try to work with oobabooga API
 
-Supports streaming and markdown, editing messages and deleting them
+Supports streaming and markdown, editing messages and deleting them, saving chat history in json
