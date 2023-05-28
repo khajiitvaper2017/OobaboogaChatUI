@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 
 namespace OobaboogaChatUI.Views
 {
@@ -10,6 +11,12 @@ namespace OobaboogaChatUI.Views
         public MainWindow()
         {
             InitializeComponent();
+
+            AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+            {
+                MessageBox.Show(((Exception)args.ExceptionObject).Message, "Unhandled Exception", MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            };
         }
     }
 }
