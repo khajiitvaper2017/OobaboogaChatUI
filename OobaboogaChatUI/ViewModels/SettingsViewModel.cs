@@ -14,7 +14,7 @@ namespace OobaboogaChatUI.ViewModels
     {
         public Settings Settings { get; set; }
         public RelayCommand SaveSettingsCommand { get; set; }
-        public Regex Regex { get; set; } = new(@"[\w.]+:\d{4}");
+        public Regex Regex { get; set; } = new(@"[\w.]+:\d+");
         public SettingsViewModel()
         {
             Settings = new Settings
@@ -35,6 +35,9 @@ namespace OobaboogaChatUI.ViewModels
         private bool IsValidData()
         {
             if(string.IsNullOrWhiteSpace(Settings.NoStreamingApiUri) || string.IsNullOrWhiteSpace(Settings.StreamingApiUri)) return false;
+            if(Settings.NoStreamingApiUri == Settings.Default.NoStreamingApiUri && 
+               Settings.StreamingApiUri == Settings.Default.StreamingApiUri && 
+               Settings.UseStreaming == Settings.Default.UseStreaming) return false;
             var noStreamingApiUriMatch = Regex.Match(Settings.NoStreamingApiUri);
             var streamingApiUriMatch = Regex.Match(Settings.StreamingApiUri);
             return noStreamingApiUriMatch.Success && streamingApiUriMatch.Success;
