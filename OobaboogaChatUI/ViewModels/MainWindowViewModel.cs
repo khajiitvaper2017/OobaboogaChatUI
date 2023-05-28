@@ -10,6 +10,7 @@ using System.Windows;
 using AsyncAwaitBestPractices.MVVM;
 using Newtonsoft.Json;
 using OobaboogaChatUI.Models;
+using OobaboogaChatUI.Properties;
 using OobaboogaChatUI.Views;
 
 namespace OobaboogaChatUI.ViewModels;
@@ -19,7 +20,9 @@ public partial class MainWindowViewModel : INotifyPropertyChanged
     public MainWindowViewModel()
     {
         HttpClient = new HttpClient();
-        HttpClient.BaseAddress = new Uri(ApiString);
+        HttpClient.BaseAddress = new Uri($"http://{Settings.Default.NoStreamingApiUri}/api/v1/");
+
+        ClientWebSocket = new ClientWebSocket();
 
         DefaultPromptPreset = new PromptPreset
         {
@@ -58,6 +61,11 @@ public partial class MainWindowViewModel : INotifyPropertyChanged
             var editMessageWindow = new EditMessageWindow { DataContext = editMessageViewModel };
             editMessageWindow.ShowDialog();
         }, _ => SelectedChatMessage != null);
+        OpenSettingsCommand = new RelayCommand(_ =>
+        {
+            var settingsWindow = new SettingsWindow();
+            settingsWindow.ShowDialog();
+        });
     }
 
     public HttpClient HttpClient { get; set; }
@@ -71,7 +79,7 @@ public partial class MainWindowViewModel : INotifyPropertyChanged
     public RelayCommand ClearChatCommand { get; }
     public RelayCommand DeleteMessageCommand { get; }
     public RelayCommand EditMessageCommand { get; }
-    public string ApiString { get; set; } = "http://localhost:5000/api/v1/"; //Oobabooga API URL
+    public RelayCommand OpenSettingsCommand { get; }
     public Chat ChatMessages { get; set; }
     public ChatMessage SelectedChatMessage { get; set; }
 
@@ -128,7 +136,7 @@ public partial class MainWindowViewModel : INotifyPropertyChanged
 
         IsBusy = false;
     }
-
+    public ClientWebSocket ClientWebSocket { get; set; }
     private async ValueTask GenerateWithStreaming()
     {
         IsBusy = true;
@@ -143,9 +151,9 @@ public partial class MainWindowViewModel : INotifyPropertyChanged
         var prompt = ChatMessages.ToPrompt();
         var request = new KoboldRequest(prompt);
 
-        var webSocket = new ClientWebSocket();
-        await webSocket.ConnectAsync(new Uri("ws://localhost:5005/api/v1/stream"), CancellationToken.None);
-        await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(request))),
+        
+        await ClientWebSocket.ConnectAsync(new Uri($"ws://{Settings.Default.StreamingApiUri}/api/v1/stream"), CancellationToken.None);
+        await ClientWebSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(request))),
             WebSocketMessageType.Text, true, CancellationToken.None);
 
         ChatMessage chatMessage;
@@ -165,15 +173,15 @@ public partial class MainWindowViewModel : INotifyPropertyChanged
             ChatMessages.Add(chatMessage);
         }
 
-        while (webSocket.State == WebSocketState.Open)
+        while (ClientWebSocket.State == WebSocketState.Open)
         {
             var buffer = new ArraySegment<byte>(new byte[1024]);
-            await webSocket.ReceiveAsync(buffer, CancellationToken.None);
+            await ClientWebSocket.ReceiveAsync(buffer, CancellationToken.None);
 
             var response = JsonConvert.DeserializeObject<WebSocketResponse>(Encoding.UTF8.GetString(buffer.Array!));
             if (response?.Event == "stream_end")
             {
-                await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "OK", CancellationToken.None);
+                await ClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "OK", CancellationToken.None);
                 break;
             }
 
@@ -186,7 +194,7 @@ public partial class MainWindowViewModel : INotifyPropertyChanged
 
             chatMessage.Message =
                 chatMessage.Message[..chatMessage.Message.IndexOf(DefaultPromptPreset.User, StringComparison.Ordinal)];
-            await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "OK", CancellationToken.None);
+            await ClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "OK", CancellationToken.None);
             break;
         }
 

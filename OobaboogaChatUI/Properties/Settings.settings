@@ -1,0 +1,15 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="OobaboogaChatUI.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="NoStreamingApiUri" Type="System.String" Scope="User">
+      <Value Profile="(Default)">localhost:5000</Value>
+    </Setting>
+    <Setting Name="StreamingApiUri" Type="System.String" Scope="User">
+      <Value Profile="(Default)">localhost:5005</Value>
+    </Setting>
+    <Setting Name="UseStreaming" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

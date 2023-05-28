@@ -9,15 +9,15 @@
         mc:Ignorable="d"
         Title="Oobabooga Chat UI"
         Height="750" Width="600"
+        WindowStartupLocation="CenterScreen"
         Style="{StaticResource MaterialDesignWindow}"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="16"
         TextOptions.TextFormattingMode="Ideal"
-        TextOptions.TextRenderingMode="Auto"
-        Background="{DynamicResource MaterialDesignPaper}"
-        FontFamily="{DynamicResource MaterialDesignFont}"
-        WindowStartupLocation="CenterScreen">
+        TextOptions.TextRenderingMode="Auto">
     <Window.DataContext>
         <viewModels:MainWindowViewModel />
     </Window.DataContext>
@@ -46,7 +46,7 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>
-                            <TextBlock Margin="4" Text="{Binding TimeStamp}" FontSize="10" Foreground="Gray" />
+                            <TextBlock Margin="5" Text="{Binding TimeStamp}" FontSize="10" Foreground="Gray" />
                             <TextBlock Margin="10,10,10,0" Text="{Binding Username}" />
                             <mdxam:MarkdownScrollViewer Margin="10,0,10,10" xml:space="preserve" Markdown="{Binding Message}" />
                         </StackPanel>
@@ -68,24 +68,27 @@
                      VerticalAlignment="Top"
                      HorizontalAlignment="Stretch"
                      HorizontalContentAlignment="Stretch" />
-            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
-                <Button Command="{Binding SaveChatCommand}"
-                        Content="Save"
-                        Margin="10,5"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Bottom" />
-                <Button Command="{Binding ClearChatCommand}"
-                        Content="Clear"
-                        Margin="10,5"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Bottom" />
-                <Button Command="{Binding SendRequestCommand}"
-                        Content="Send"
-                        Margin="10,5"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Bottom" />
-
-            </StackPanel>
+            <DockPanel Grid.Row="1" Margin="5">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Button Command="{Binding OpenSettingsCommand}"
+                            Content="Settings"
+                            Margin="10,5"
+                            VerticalAlignment="Bottom" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Command="{Binding SaveChatCommand}"
+                            Content="Save"
+                            Margin="10,5"
+                            VerticalAlignment="Bottom" />
+                    <Button Command="{Binding ClearChatCommand}"
+                            Content="Clear"
+                            Margin="10,5"
+                            VerticalAlignment="Bottom" />
+                    <Button Command="{Binding SendRequestCommand}"
+                            Content="Send"
+                            Margin="10,5"
+                            VerticalAlignment="Bottom" /></StackPanel>
+            </DockPanel>
         </Grid>
     </Grid>
 </Window>
