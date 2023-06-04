@@ -66,16 +66,25 @@ public class Chat : ObservableCollection<ChatMessage>
         File.WriteAllText(path, json);
     }
 
-    public void Load()
+    public void Load(string? fileName = null)
     {
-        if (!Directory.Exists(Path.Combine(Environment.CurrentDirectory, "ChatHistory"))) return;
-        var files = Directory.GetFiles(Path.Combine(Environment.CurrentDirectory, "ChatHistory"));
-        var path = files.MaxBy(x => x);
+        if (fileName == null)
+        {
+            if (!Directory.Exists(Path.Combine(Environment.CurrentDirectory, "ChatHistory")))
+                return;
 
-        if (!File.Exists(path)) return;
+            var files = Directory.GetFiles(Path.Combine(Environment.CurrentDirectory, "ChatHistory"));
+            fileName = files.MaxBy(x => x);
 
+            if (!File.Exists(fileName))
+                return;
+        }
+        else if (!File.Exists(fileName))
+        {
+            return;
+        }
 
-        var json = File.ReadAllText(path);
+        var json = File.ReadAllText(fileName);
         var chat = JsonSerializer.Deserialize<Chat>(json);
 
         Items.Clear();
