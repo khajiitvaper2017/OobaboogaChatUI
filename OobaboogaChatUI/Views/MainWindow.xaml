@@ -29,8 +29,8 @@
         <ScrollViewer Grid.Row="0" CanContentScroll="False" views:AutoScrollBehavior.AutoScroll="True"
                       VerticalScrollBarVisibility="Auto">
             <ListView Margin="10"
-                      ItemsSource="{Binding ChatMessages}"
-                      SelectedItem="{Binding SelectedChatMessage}"
+                      ItemsSource="{Binding OobaboogaClient.ChatMessages}"
+                      SelectedItem="{Binding OobaboogaClient.SelectedChatMessage}"
                       Style="{StaticResource MaterialDesignCardsListBox}">
                 <ListView.ContextMenu>
                     <ContextMenu>
@@ -85,6 +85,7 @@
                             Margin="10,5"
                             VerticalAlignment="Bottom" />
                     <Button Command="{Binding SendRequestCommand}"
+                            CommandParameter="{Binding Request}"
                             Content="Send"
                             Margin="10,5"
                             VerticalAlignment="Bottom" /></StackPanel>
