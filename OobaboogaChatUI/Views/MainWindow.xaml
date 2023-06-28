@@ -74,8 +74,6 @@
                             Content="Settings"
                             Margin="10,5"
                             VerticalAlignment="Bottom" />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Command="{Binding SaveChatCommand}"
                             Content="Save"
                             Margin="10,5"
@@ -84,6 +82,13 @@
                             Content="Clear"
                             Margin="10,5"
                             VerticalAlignment="Bottom" />
+                    <Button Command="{Binding LoadHistoryCommand}"
+                            Content="Load"
+                            Margin="10,5"
+                            VerticalAlignment="Bottom" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Command="{Binding SendRequestCommand}"
                             CommandParameter="{Binding Request}"
                             Content="Send"

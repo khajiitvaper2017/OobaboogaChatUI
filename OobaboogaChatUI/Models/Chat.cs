@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
@@ -10,7 +11,7 @@ namespace OobaboogaChatUI.Models;
 public class Chat : ObservableCollection<ChatMessage>
 {
     private PromptPreset _prompt;
-
+    public string ChatHistoryPath { get; set; } = Path.Combine(Environment.CurrentDirectory, "ChatHistory");
     public Chat()
     {
     }
@@ -56,10 +57,9 @@ public class Chat : ObservableCollection<ChatMessage>
 
     public void Save()
     {
-        if (!Directory.Exists(Path.Combine(Environment.CurrentDirectory, "ChatHistory")))
-            Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory, "ChatHistory"));
-        var path = Path.Combine(Environment.CurrentDirectory, "ChatHistory",
-            $"{DateTime.Now.ToFileTime()}history.json");
+        if (!Directory.Exists(ChatHistoryPath))
+            Directory.CreateDirectory(ChatHistoryPath);
+        var path = Path.Combine(ChatHistoryPath, $"{DateTime.Now.ToFileTime()}history.json");
 
         var json = JsonSerializer.Serialize(this);
 
@@ -68,12 +68,13 @@ public class Chat : ObservableCollection<ChatMessage>
 
     public void Load(string? fileName = null)
     {
+        Directory.SetCurrentDirectory(ChatHistoryPath);
         if (fileName == null)
         {
-            if (!Directory.Exists(Path.Combine(Environment.CurrentDirectory, "ChatHistory")))
+            if (!Directory.Exists(ChatHistoryPath))
                 return;
 
-            var files = Directory.GetFiles(Path.Combine(Environment.CurrentDirectory, "ChatHistory"));
+            var files = Directory.GetFiles(ChatHistoryPath);
             fileName = files.MaxBy(x => x);
 
             if (!File.Exists(fileName))
@@ -89,5 +90,17 @@ public class Chat : ObservableCollection<ChatMessage>
 
         Items.Clear();
         foreach (var chatMessage in chat) Add(chatMessage);
+
+        Directory.SetCurrentDirectory(Environment.CurrentDirectory);
+    }
+
+    public List<string> GetAvailableHistory()
+    {
+        var path = Path.Combine(Environment.CurrentDirectory, "ChatHistory");
+        if (!Directory.Exists(path))
+            return new List<string>();
+
+        List<string> filesWithoutDirectory = Directory.GetFiles(path).Select(Path.GetFileName).ToList();
+        return filesWithoutDirectory;
     }
 }

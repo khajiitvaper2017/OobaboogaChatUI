@@ -1,0 +1,40 @@
+﻿<Window x:Class="OobaboogaChatUI.Views.SelectWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:OobaboogaChatUI.ViewModels"
+        mc:Ignorable="d"
+        Title="Selection"
+        Height="200" Width="400"
+        WindowStartupLocation="CenterScreen"
+        Style="{StaticResource MaterialDesignWindow}"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="16"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto">
+    <Window.DataContext>
+        <viewModels:SelectViewModel />
+    </Window.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                  Grid.Row="0"
+                  ItemsSource="{Binding Path=Items}"
+                  SelectedItem="{Binding Path=SelectedItem}"
+                  Margin="12"/>
+        <Button  Margin="12"  Grid.Row="2" Content="Select"
+                 Height="48"
+                 Command="{Binding Path=SelectCommand}"
+                 CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
+                 Style="{StaticResource MaterialDesignRaisedButton}" />
+
+    </Grid>
+</Window>

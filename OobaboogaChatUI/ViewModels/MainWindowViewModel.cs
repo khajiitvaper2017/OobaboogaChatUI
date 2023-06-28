@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Net.Http;
 using System.Net.WebSockets;
 using AsyncAwaitBestPractices.MVVM;
@@ -43,8 +44,7 @@ public partial class MainWindowViewModel : INotifyPropertyChanged
         }
 
         SendRequestCommand = new AsyncValueCommand<string>(OobaboogaClient.Generate, _ => !OobaboogaClient.IsBusy);
-        OobaboogaClient.IsBusyChanged += (_, _) => OnIsBusyChanged();
-
+        
         SaveChatCommand = new RelayCommand(_ => { OobaboogaClient.ChatMessages.Save(); });
         ClearChatCommand = new RelayCommand(_ =>
         {
@@ -72,6 +72,21 @@ public partial class MainWindowViewModel : INotifyPropertyChanged
 
             OobaboogaClient.UseStreaming(Settings.Default.UseStreaming);
         });
+
+        LoadHistoryCommand = new RelayCommand(_ =>
+        {
+            var list = OobaboogaClient.ChatMessages.GetAvailableHistory();
+            var window = new SelectWindow();
+            var selectViewModel = window.DataContext as SelectViewModel;
+            selectViewModel?.UseCollection(list);
+            window.ShowDialog();
+            if (window.DialogResult == true)
+            {
+                OobaboogaClient.LoadChat(selectViewModel?.SelectedItem!);
+            }
+        });
+
+        OobaboogaClient.IsBusyChanged += (_, _) => OnIsBusyChanged();
     }
 
     public OobaboogaClient OobaboogaClient { get; set; }
@@ -79,6 +94,7 @@ public partial class MainWindowViewModel : INotifyPropertyChanged
     public AsyncValueCommand<string> SendRequestCommand { get; }
     public RelayCommand SaveChatCommand { get; }
     public RelayCommand ClearChatCommand { get; }
+    public RelayCommand LoadHistoryCommand { get; }
     public RelayCommand DeleteMessageCommand { get; }
     public RelayCommand EditMessageCommand { get; }
     public RelayCommand OpenSettingsCommand { get; }

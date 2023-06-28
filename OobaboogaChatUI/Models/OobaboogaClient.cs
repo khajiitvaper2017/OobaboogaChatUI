@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -41,6 +42,13 @@ public partial class OobaboogaClient : INotifyPropertyChanged
     public bool IsStreaming { get; set; }
     public bool IsBusy { get; set; }
 
+    public event EventHandler? IsBusyChanged;
+
+    private void OnIsBusyChanged()
+    {
+        IsBusyChanged?.Invoke(this, EventArgs.Empty);
+    }
+
     public void UseStreaming(bool useStreaming, HttpClient? httpClient = null, ClientWebSocket? clientWebSocket = null)
     {
         IsStreaming = useStreaming;
@@ -48,13 +56,6 @@ public partial class OobaboogaClient : INotifyPropertyChanged
         HttpClient = httpClient ?? new HttpClient
             { BaseAddress = new Uri($"http://{Settings.Default.NoStreamingApiUri}/api/v1/") };
         ClientWebSocket = clientWebSocket ?? new ClientWebSocket();
-    }
-
-    public event EventHandler? IsBusyChanged;
-
-    private void OnIsBusyChanged()
-    {
-        IsBusyChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public void LoadChat(string? fileName = null)
