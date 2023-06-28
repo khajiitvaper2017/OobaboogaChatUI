@@ -8,7 +8,7 @@
         xmlns:views="clr-namespace:OobaboogaChatUI.Views"
         mc:Ignorable="d"
         Title="Oobabooga Chat UI"
-        Height="750" Width="600"
+        Height="750" Width="800"
         WindowStartupLocation="CenterScreen"
         Style="{StaticResource MaterialDesignWindow}"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
@@ -86,14 +86,25 @@
                             Content="Load"
                             Margin="10,5"
                             VerticalAlignment="Bottom" />
+                    <Button Command="{Binding SelectCharacterCommand}"
+                            Content="Select Character"
+                            Margin="10,5"
+                            VerticalAlignment="Bottom" />
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Command="{Binding ImpersonateRequestCommand}"
+                            CommandParameter="{Binding Request}"
+                            Content="Impersonate"
+                            Margin="10,5"
+                            VerticalAlignment="Bottom" />
                     <Button Command="{Binding SendRequestCommand}"
                             CommandParameter="{Binding Request}"
                             Content="Send"
                             Margin="10,5"
-                            VerticalAlignment="Bottom" /></StackPanel>
+                            IsDefault="True"
+                            VerticalAlignment="Bottom" />
+                </StackPanel>
             </DockPanel>
         </Grid>
     </Grid>

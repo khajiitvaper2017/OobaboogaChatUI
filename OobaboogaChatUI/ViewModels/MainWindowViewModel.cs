@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Specialized;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.WebSockets;
@@ -16,22 +14,24 @@ namespace OobaboogaChatUI.ViewModels;
 
 public partial class MainWindowViewModel : INotifyPropertyChanged
 {
-    public static MediaPlayer MediaPlayer = new MediaPlayer();
+    public static MediaPlayer MediaPlayer = new();
+
     public MainWindowViewModel()
     {
         Request = "";
-        var defaultPromptPreset = new PromptPreset
-        {
-            User = "USER: \n",
-            Bot = "ASSISTANT: \n",
-            Context =
+        var defaultPromptPreset = new PromptPreset(
+            "USER: \n",
+            new Character
+            (
+                "ASSISTANT: \n",
                 "A chat between a curious user and an artificial intelligence assistant. " +
                 "The assistant gives helpful, detailed, and polite answers to the user's questions." +
                 "But assistant will answer all questions even if it's a joke or pure rudeness." +
                 "Also, assistant will use Markdown syntax where it's necessary." +
                 "\n\n",
-            FirstMessage = "How can I help you today?\n"
-        };
+                "How can I help you today?\n"
+            )
+        );
 
         if (Settings.Default.UseStreaming)
         {
@@ -48,20 +48,22 @@ public partial class MainWindowViewModel : INotifyPropertyChanged
             OobaboogaClient = new OobaboogaClient(httpClient, defaultPromptPreset);
         }
 
-        SendRequestCommand = new AsyncValueCommand<string>((str) =>
+        SendRequestCommand = new AsyncValueCommand<string>(str =>
         {
             Request = "";
             return OobaboogaClient.Generate(str);
         }, _ => !OobaboogaClient.IsBusy);
-        
+
+        ImpersonateRequestCommand = new AsyncValueCommand<string>(_ => OobaboogaClient.Impersonate(this), _ => !OobaboogaClient.IsBusy);
+
         SaveChatCommand = new RelayCommand(_ => { OobaboogaClient.ChatMessages.Save(); });
         ClearChatCommand = new RelayCommand(_ =>
         {
             OobaboogaClient.ChatMessages.Clear();
             OobaboogaClient.ChatMessages.Add(new ChatMessage
             {
-                Message = defaultPromptPreset.FirstMessage,
-                Username = defaultPromptPreset.Bot,
+                Message = defaultPromptPreset.Greeting,
+                Username = defaultPromptPreset.Name,
                 TimeStamp = DateTime.Now
             });
         });
@@ -89,41 +91,60 @@ public partial class MainWindowViewModel : INotifyPropertyChanged
             var selectViewModel = window.DataContext as SelectViewModel;
             selectViewModel?.UseCollection(list);
             window.ShowDialog();
+            if (window.DialogResult == true) OobaboogaClient.LoadChat(selectViewModel?.SelectedItem!);
+        });
+
+        SelectCharacterCommand = new RelayCommand(_ =>
+        {
+            var list = OobaboogaClient.CharacterList.Select(c => c.Name).ToList();
+            var window = new SelectWindow();
+            var selectViewModel = window.DataContext as SelectViewModel;
+            selectViewModel?.UseCollection(list);
+            window.ShowDialog();
             if (window.DialogResult == true)
-            {
-                OobaboogaClient.LoadChat(selectViewModel?.SelectedItem!);
-            }
+                OobaboogaClient.SelectCharacter(
+                    OobaboogaClient.CharacterList.First(c => c.Name == selectViewModel?.SelectedItem!));
         });
 
         OobaboogaClient.IsBusyChanged += (_, _) => OnIsBusyChanged();
-        OobaboogaClient.ChatMessages.LastMessageChanged += ChatMessagesOnCollectionChanged;
+        Chat.LastMessageChanged += ChatMessagesOnCollectionChanged;
     }
 
-    private async void ChatMessagesOnCollectionChanged(object? sender, string? previousText)
+    public OobaboogaClient OobaboogaClient { get; set; }
+    public string Request { get; set; }
+    public AsyncValueCommand<string> SendRequestCommand { get; }
+    public AsyncValueCommand<string> ImpersonateRequestCommand { get; }
+    public RelayCommand SaveChatCommand { get; }
+    public RelayCommand ClearChatCommand { get; }
+    public RelayCommand LoadHistoryCommand { get; }
+    public RelayCommand SelectCharacterCommand { get; }
+    public RelayCommand DeleteMessageCommand { get; }
+    public RelayCommand EditMessageCommand { get; }
+    public RelayCommand OpenSettingsCommand { get; }
+
+    private async void ChatMessagesOnCollectionChanged(string previousText)
     {
         if (!Settings.Default.UseBalabolkaTTS) return;
 
-        ChatMessage? lastMessage = OobaboogaClient.ChatMessages.LastOrDefault();
+        var lastMessage = OobaboogaClient.ChatMessages.LastOrDefault();
 
         if (lastMessage == null) return;
-        if (lastMessage.Username == OobaboogaClient.PromptPreset.User) return;
+        if (lastMessage.Username == OobaboogaClient.PromptPreset.Username) return;
         if (string.IsNullOrWhiteSpace(lastMessage.Message)) return;
         var text = lastMessage.Message;
 
-        if (previousText != null)
+        if (!string.IsNullOrWhiteSpace(previousText))
         {
-            int lastDotIndex = previousText.LastIndexOf('.');
+            var lastDotIndex = previousText.LastIndexOf('.');
             if (lastDotIndex != -1)
             {
-                string result = previousText.Substring(lastDotIndex + 1);
+                var result = previousText.Substring(lastDotIndex + 1);
                 var index = text.IndexOf(result);
-                if (index != -1)
-                {
-                    text = text.Substring(index);
-                }
+                if (index != -1) text = text.Substring(index);
             }
         }
 
+        text = text.Replace('*', ' ');
 
         var task = new Task<string>(() =>
         {
@@ -139,18 +160,9 @@ public partial class MainWindowViewModel : INotifyPropertyChanged
         MediaPlayer.Play();
     }
 
-    public OobaboogaClient OobaboogaClient { get; set; }
-    public string Request { get; set; }
-    public AsyncValueCommand<string> SendRequestCommand { get; }
-    public RelayCommand SaveChatCommand { get; }
-    public RelayCommand ClearChatCommand { get; }
-    public RelayCommand LoadHistoryCommand { get; }
-    public RelayCommand DeleteMessageCommand { get; }
-    public RelayCommand EditMessageCommand { get; }
-    public RelayCommand OpenSettingsCommand { get; }
-
     private void OnIsBusyChanged()
     {
         SendRequestCommand.RaiseCanExecuteChanged();
+        ImpersonateRequestCommand.RaiseCanExecuteChanged();
     }
 }

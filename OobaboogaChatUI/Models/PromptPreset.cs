@@ -1,9 +1,12 @@
 namespace OobaboogaChatUI.Models;
 
-public class PromptPreset
+public class PromptPreset : Character
 {
-    public string User { get; set; }
-    public string Bot { get; set; }
-    public string Context { get; set; }
-    public string FirstMessage { get; set; }
+    public PromptPreset(string username, Character character) : base(character)
+    {
+        Username = username;
+    }
+
+    //TODO: Remove this class
+    public string Username { get; set; }
 }

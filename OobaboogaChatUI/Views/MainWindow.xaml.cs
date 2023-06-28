@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
+using System.Runtime.InteropServices;
 using System.Windows;
+
 
 namespace OobaboogaChatUI.Views
 {

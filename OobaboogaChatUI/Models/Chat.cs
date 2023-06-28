@@ -12,13 +12,13 @@ namespace OobaboogaChatUI.Models;
 
 public class Chat : ObservableCollection<ChatMessage>
 {
-    public delegate void MessageAddedEventHandler(object? sender, string? previousText);
+    public delegate void MessageAddedEventHandler(string previousText);
 
-    public virtual event MessageAddedEventHandler LastMessageChanged;
+    public static event MessageAddedEventHandler LastMessageChanged;
 
-    public void NotifyLastMessageChanged(string? previousText = null)
-    { 
-        LastMessageChanged.Invoke(this, previousText);
+    public static void NotifyLastMessageChanged(string previousText = "")
+    {
+        LastMessageChanged.Invoke(previousText);
     }
 
     private PromptPreset _prompt;
@@ -41,8 +41,8 @@ public class Chat : ObservableCollection<ChatMessage>
             if (Items.Count == 0)
                 Add(new ChatMessage
                 {
-                    Message = value.FirstMessage,
-                    Username = value.Bot,
+                    Message = value.Greeting,
+                    Username = value.Name,
                     TimeStamp = DateTime.Now
                 });
             OnPropertyChanged(new PropertyChangedEventArgs(nameof(Prompt)));
@@ -56,7 +56,18 @@ public class Chat : ObservableCollection<ChatMessage>
 
         var result = promptString + ToHistory();
 
-        if (Prompt != null && Items.Last().Username == Prompt.User) result += Environment.NewLine + Prompt.Bot;
+        if (Prompt != null && Items.Last().Username == Prompt.Username) result += Environment.NewLine + Prompt.Name;
+        return result;
+    }
+
+    public string ToImpersonatePrompt(string request)
+    {
+        var promptString = "";
+        if (Prompt != null) promptString = Prompt.Context;
+
+        var result = promptString + ToHistory();
+
+        result += Environment.NewLine + Prompt.Username + request;
         return result;
     }
 
@@ -100,7 +111,7 @@ public class Chat : ObservableCollection<ChatMessage>
 
         Items.Clear();
         foreach (var chatMessage in chat) Add(chatMessage);
-
+        Prompt.Name = this.First().Username; //TODO: Prompt isn't saved when loading chat 
         Directory.SetCurrentDirectory(Environment.CurrentDirectory);
     }
 
