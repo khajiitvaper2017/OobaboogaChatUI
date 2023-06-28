@@ -2,14 +2,25 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Windows.Forms;
 
 namespace OobaboogaChatUI.Models;
 
 public class Chat : ObservableCollection<ChatMessage>
 {
+    public delegate void MessageAddedEventHandler(object? sender, string? previousText);
+
+    public virtual event MessageAddedEventHandler LastMessageChanged;
+
+    public void NotifyLastMessageChanged(string? previousText = null)
+    { 
+        LastMessageChanged.Invoke(this, previousText);
+    }
+
     private PromptPreset _prompt;
     public string ChatHistoryPath { get; set; } = Path.Combine(Environment.CurrentDirectory, "ChatHistory");
     public Chat()
@@ -21,7 +32,6 @@ public class Chat : ObservableCollection<ChatMessage>
         if (prompt == null) return;
         Prompt = prompt;
     }
-
     public PromptPreset Prompt
     {
         get => _prompt;

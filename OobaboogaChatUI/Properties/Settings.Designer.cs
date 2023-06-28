@@ -58,5 +58,29 @@ namespace OobaboogaChatUI.Properties {
                 this["UseStreaming"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool UseBalabolkaTTS {
+            get {
+                return ((bool)(this["UseBalabolkaTTS"]));
+            }
+            set {
+                this["UseBalabolkaTTS"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string BalabolkaExecutable {
+            get {
+                return ((string)(this["BalabolkaExecutable"]));
+            }
+            set {
+                this["BalabolkaExecutable"] = value;
+            }
+        }
     }
 }

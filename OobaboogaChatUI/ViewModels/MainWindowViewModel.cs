@@ -1,8 +1,12 @@
 using System;
+using System.Collections.Specialized;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.WebSockets;
+using System.Threading.Tasks;
+using System.Windows.Media;
 using AsyncAwaitBestPractices.MVVM;
 using OobaboogaChatUI.Models;
 using OobaboogaChatUI.Properties;
@@ -12,6 +16,7 @@ namespace OobaboogaChatUI.ViewModels;
 
 public partial class MainWindowViewModel : INotifyPropertyChanged
 {
+    public static MediaPlayer MediaPlayer = new MediaPlayer();
     public MainWindowViewModel()
     {
         Request = "";
@@ -43,7 +48,11 @@ public partial class MainWindowViewModel : INotifyPropertyChanged
             OobaboogaClient = new OobaboogaClient(httpClient, defaultPromptPreset);
         }
 
-        SendRequestCommand = new AsyncValueCommand<string>(OobaboogaClient.Generate, _ => !OobaboogaClient.IsBusy);
+        SendRequestCommand = new AsyncValueCommand<string>((str) =>
+        {
+            Request = "";
+            return OobaboogaClient.Generate(str);
+        }, _ => !OobaboogaClient.IsBusy);
         
         SaveChatCommand = new RelayCommand(_ => { OobaboogaClient.ChatMessages.Save(); });
         ClearChatCommand = new RelayCommand(_ =>
@@ -87,6 +96,47 @@ public partial class MainWindowViewModel : INotifyPropertyChanged
         });
 
         OobaboogaClient.IsBusyChanged += (_, _) => OnIsBusyChanged();
+        OobaboogaClient.ChatMessages.LastMessageChanged += ChatMessagesOnCollectionChanged;
+    }
+
+    private async void ChatMessagesOnCollectionChanged(object? sender, string? previousText)
+    {
+        if (!Settings.Default.UseBalabolkaTTS) return;
+
+        ChatMessage? lastMessage = OobaboogaClient.ChatMessages.LastOrDefault();
+
+        if (lastMessage == null) return;
+        if (lastMessage.Username == OobaboogaClient.PromptPreset.User) return;
+        if (string.IsNullOrWhiteSpace(lastMessage.Message)) return;
+        var text = lastMessage.Message;
+
+        if (previousText != null)
+        {
+            int lastDotIndex = previousText.LastIndexOf('.');
+            if (lastDotIndex != -1)
+            {
+                string result = previousText.Substring(lastDotIndex + 1);
+                var index = text.IndexOf(result);
+                if (index != -1)
+                {
+                    text = text.Substring(index);
+                }
+            }
+        }
+
+
+        var task = new Task<string>(() =>
+        {
+            var path = BalabolkaTts.GenerateAudio(text);
+            return string.IsNullOrWhiteSpace(path) ? "" : path;
+        });
+        task.Start();
+        await task;
+        if (task.Result == "") return;
+        MediaPlayer.Stop();
+        MediaPlayer.Open(new Uri(task.Result));
+        MediaPlayer.ScrubbingEnabled = true;
+        MediaPlayer.Play();
     }
 
     public OobaboogaClient OobaboogaClient { get; set; }

@@ -105,8 +105,10 @@ public partial class OobaboogaClient : INotifyPropertyChanged
                 ? responseText.Length
                 : responseText.IndexOf(PromptPreset.User, StringComparison.Ordinal))];
 
+            var previous = ChatMessages.Last().Message;
             ChatMessages.Last().Message += responseText;
             ChatMessages.Last().TimeStamp = DateTime.Now;
+            ChatMessages.NotifyLastMessageChanged(previous);
         }
         else
         {
@@ -117,6 +119,7 @@ public partial class OobaboogaClient : INotifyPropertyChanged
 
             ChatMessages.Add(new ChatMessage
                 { Message = responseText, Username = PromptPreset.Bot, TimeStamp = DateTime.Now });
+            ChatMessages.NotifyLastMessageChanged();
         }
 
         IsBusy = false;
@@ -185,6 +188,7 @@ public partial class OobaboogaClient : INotifyPropertyChanged
             break;
         }
 
+        ChatMessages.NotifyLastMessageChanged();
         chatMessage.TimeStamp = DateTime.Now;
 
         IsBusy = false;
